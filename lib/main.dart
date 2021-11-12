@@ -7,7 +7,7 @@ import '../utils/constant.dart' as Constants;
 
 
 void main() {
-  runApp( MainPage());
+  runApp(MainPage());
 }
 
 class MainPage extends StatefulWidget {
@@ -22,7 +22,8 @@ class _MainPageState extends State<MainPage> {
   final screens = [
     const HomePage(),
     const PeoplePage(),
-    const Center(child: Text('Episode', style: TextStyle(fontFamily: 'Shwifty', fontSize: 60))),
+    const Center(child: Text(
+        'Episode', style: TextStyle(fontFamily: 'Shwifty', fontSize: 60))),
   ];
   List<String> choices = <String>[
     Constants.DISCONNECTION,
@@ -35,42 +36,45 @@ class _MainPageState extends State<MainPage> {
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        home: Scaffold(
-        appBar: AppBar(
-          title: Image.asset("assets/Rick_and_Morty_logo.png",
-              fit: BoxFit.contain, height: 40),
-          centerTitle: true,
-          backgroundColor: Colors.black,
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-              icon: const Icon(Icons.settings),
-            )
-          ],
-        ),
-        body: screens[currentIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.black,
-          selectedItemColor: Colors.lightGreen[700],
-          unselectedItemColor: Colors.white,
-          showUnselectedLabels: false,
-          currentIndex: currentIndex,
-          onTap: (index) => setState(() => currentIndex = index),
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: "People"),
-            BottomNavigationBarItem(icon: Icon(Icons.movie), label: "Episode"),
-          ],
-        ), // This trailing comma makes auto-formatting nicer for build methods.
-      ));
+  Widget build(BuildContext context) =>
+      MaterialApp(
+          home: Scaffold(
+            appBar: AppBar(
+              title: Image.asset("assets/Rick_and_Morty_logo.png",
+                  fit: BoxFit.contain, height: 40),
+              centerTitle: true,
+              backgroundColor: Colors.black,
+              actions: <Widget>[
+                PopupMenuButton<String>(
+                  onSelected: choiceAction,
+                  itemBuilder: (BuildContext context) {
+                    return choices.map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(choice),
+                      );
+                    }).toList();
+                  },
+                  icon: const Icon(Icons.settings),
+                )
+              ],
+            ),
+            body: screens[currentIndex],
+            bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Colors.black,
+              selectedItemColor: Colors.lightGreen[700],
+              unselectedItemColor: Colors.white,
+              showUnselectedLabels: false,
+              currentIndex: currentIndex,
+              onTap: (index) => setState(() => currentIndex = index),
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.account_circle), label: "People"),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.movie), label: "Episode"),
+              ],
+            ), // This trailing comma makes auto-formatting nicer for build methods.
+          ));
 }
