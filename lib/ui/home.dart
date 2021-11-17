@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Expanded(child: _jobsListView(data)),
                     Padding(
-                      padding: EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -208,47 +208,5 @@ Color getStatusColor(String status) {
       {
         return Colors.white;
       }
-  }
-}
-
-class StarRating extends StatefulWidget {
-  StarRating({Key? key}) : super(key: key);
-
-  @override
-  StarRatingState createState() => StarRatingState();
-}
-
-class StarRatingState extends State<StarRating> {
-  var value = 0.0;
-
-  StarRatingState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-            child: Container(
-          alignment: Alignment.center,
-          child: SmoothStarRating(
-            rating: value,
-            isReadOnly: false,
-            borderColor: Colors.black12,
-            color: Colors.black54,
-            size: 24,
-            onRated: (index) {
-              setState(() => value = index);
-            },
-          ),
-        )),
-        Expanded(
-            child: Container(
-                alignment: Alignment.center,
-                child: Text('$value/5 ',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.robotoCondensed(
-                        color: Colors.black54, fontSize: 20))))
-      ],
-    );
   }
 }
