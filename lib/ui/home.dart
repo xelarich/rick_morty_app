@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rick_morty_app/data/model/all_characters.dart';
 import 'package:rick_morty_app/data/model/character.dart';
 import 'package:rick_morty_app/data/repository/repository.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
@@ -16,31 +17,76 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<Character> futureCharacter;
+  late Future<AllCharacters> futureAllCharacter;
+  var indexPage = 1;
 
   @override
   void initState() {
     Random random = Random();
-    futureCharacter = getCharacter(random.nextInt(825)+1);
+    //futureCharacter = getCharacter(random.nextInt(825) + 1);
+    futureAllCharacter = getAllCharacters(indexPage);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
-      body: FutureBuilder<Character>(
-          future: futureCharacter,
+      body: FutureBuilder<AllCharacters>(
+          future: futureAllCharacter,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListView(
-                children: [
-                  _buildItemList(context, snapshot.data!),
-                  const Divider(
-                      color: Colors.black54,
-                      indent: 24,
-                      endIndent: 24,
-                      thickness: 2),
-                ],
-              );
+              List<Character> data = snapshot.data!.results;
+              return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(child: _jobsListView(data)),
+                    Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      onSurface: Colors.white,
+                                      primary: Colors.lightGreen[700]),
+                                  onPressed: (snapshot.data!.info.prev == null)
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            indexPage--;
+                                            futureAllCharacter =
+                                                getAllCharacters(indexPage);
+                                          });
+                                        },
+                                  child: const Icon(Icons.arrow_back))),
+                          Expanded(
+                            child: Text(
+                              "Page $indexPage",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          Expanded(
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      onSurface: Colors.white,
+                                      primary: Colors.lightGreen[700]),
+                                  onPressed: (snapshot.data!.info.next == null)
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            indexPage++;
+                                            futureAllCharacter =
+                                                getAllCharacters(indexPage);
+                                          });
+                                        },
+                                  child: const Icon(Icons.arrow_forward))),
+                        ],
+                      ),
+                    )
+                  ]);
             } else if (snapshot.hasError) {
               return Text('${snapshot.error}');
             }
@@ -48,6 +94,14 @@ class _HomePageState extends State<HomePage> {
               child: CircularProgressIndicator(),
             );
           }));
+}
+
+ListView _jobsListView(List<Character> data) {
+  return ListView.builder(
+      itemCount: data.length,
+      itemBuilder: (context, index) {
+        return _buildItemList(context, data[index]);
+      });
 }
 
 Widget _buildItemList(BuildContext context, Character character) {
