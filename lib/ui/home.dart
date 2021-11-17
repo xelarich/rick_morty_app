@@ -2,11 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:rick_morty_app/data/model/all_characters.dart';
 import 'package:rick_morty_app/data/model/character.dart';
 import 'package:rick_morty_app/data/repository/repository.dart';
-import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,76 +16,129 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<Character> futureCharacter;
-  late Future<AllCharacters> futureAllCharacter;
   var indexPage = 1;
+  Random random = Random();
 
   @override
   void initState() {
-    Random random = Random();
-    //futureCharacter = getCharacter(random.nextInt(825) + 1);
-    futureAllCharacter = getAllCharacters(indexPage);
+    futureCharacter = getCharacter(random.nextInt(825) + 1);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
-      body: FutureBuilder<AllCharacters>(
-          future: futureAllCharacter,
+      body: FutureBuilder<Character>(
+          future: futureCharacter,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<Character> data = snapshot.data!.results;
-              return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(child: _jobsListView(data)),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              Character data = snapshot.data!;
+              return Slidable(
+                  startActionPane: ActionPane(
+                    motion: BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        backgroundColor: Colors.red.shade700,
+                        onPressed: (context) => setState(() {
+                          futureCharacter =
+                              getCharacter(random.nextInt(825) + 1);
+                        }),
+                        foregroundColor: Colors.white,
+                        icon: Icons.thumb_down,
+                        label: 'Dislike',
+                      ),
+                    ],
+                  ),
+                  endActionPane: ActionPane(
+                    motion: BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        backgroundColor: Colors.green.shade700,
+                        onPressed: (context) => setState(() {
+                          futureCharacter =
+                              getCharacter(random.nextInt(825) + 1);
+                        }),
+                        foregroundColor: Colors.white,
+                        icon: Icons.thumb_up,
+                        label: 'Like',
+                      ),
+                    ],
+                  ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.45,
+                    child: Card(
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
                         children: [
                           Expanded(
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      onSurface: Colors.white,
-                                      primary: Colors.lightGreen[700]),
-                                  onPressed: (snapshot.data!.info.prev == null)
-                                      ? null
-                                      : () {
-                                          setState(() {
-                                            indexPage--;
-                                            futureAllCharacter =
-                                                getAllCharacters(indexPage);
-                                          });
-                                        },
-                                  child: const Icon(Icons.arrow_back))),
-                          Expanded(
-                            child: Text(
-                              "Page $indexPage",
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.white),
-                            ),
+                            child: Image.network(data.image,
+                                width: MediaQuery.of(context).size.width,
+                                fit: BoxFit.cover),
                           ),
-                          Expanded(
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      onSurface: Colors.white,
-                                      primary: Colors.lightGreen[700]),
-                                  onPressed: (snapshot.data!.info.next == null)
-                                      ? null
-                                      : () {
-                                          setState(() {
-                                            indexPage++;
-                                            futureAllCharacter =
-                                                getAllCharacters(indexPage);
-                                          });
-                                        },
-                                  child: const Icon(Icons.arrow_forward))),
+                          Padding(
+                              padding:
+                                  const EdgeInsetsDirectional.only(start: 16),
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                child: Title(
+                                    color: Colors.white,
+                                    child: Text(
+                                      data.name,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 28),
+                                    )),
+                              )),
+                          Padding(
+                              padding:
+                                  const EdgeInsetsDirectional.only(start: 16),
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                child: Title(
+                                    color: Colors.white,
+                                    child: Text(
+                                      data.species,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 20),
+                                    )),
+                              )),
+                          Divider(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text('data'),
+                              Text('data'),
+                            ],
+                          ),
+                          /*ButtonBar(
+                            alignment: MainAxisAlignment.end,
+                            children: [
+                              FloatingActionButton.extended(
+                                label: Text("Dislike"),
+                                icon: const Icon(Icons.thumb_down),
+                                backgroundColor: Colors.red.shade700,
+                                onPressed: () {
+                                  // Perform some action
+                                },
+                              ),
+                              FloatingActionButton.extended(
+                                label: Text("Like"),
+                                icon: const Icon(Icons.thumb_up),
+                                backgroundColor: Colors.lightGreen.shade700,
+                                onPressed: () {
+                                  // Perform some action
+                                },
+                              )
+                            ],
+                          ),*/
                         ],
                       ),
-                    )
-                  ]);
+                    ),
+                  ));
             } else if (snapshot.hasError) {
               return Text('${snapshot.error}');
             }
