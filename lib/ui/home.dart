@@ -110,8 +110,22 @@ class _HomePageState extends State<HomePage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text('data'),
-                              Text('data'),
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Padding(
+                                      padding: EdgeInsets.fromLTRB(8, 0, 0, 8),
+                                      child: Icon(Icons.thumb_up_outlined,
+                                          color: Colors.grey.shade400,size: 28)),
+                                  Padding(
+                                      padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
+                                      child: Text(
+                                        '0',
+                                        style: TextStyle(
+                                            color: Colors.grey.shade400,fontSize: 28),
+                                      )),
+                                ],
+                              ),
                             ],
                           ),
                           /*ButtonBar(
