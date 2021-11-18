@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:rick_morty_app/data/model/all_characters.dart';
 import 'package:rick_morty_app/data/model/character.dart';
 import 'package:rick_morty_app/data/repository/repository.dart';
 
@@ -17,6 +16,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Future<Character> futureCharacter;
   var indexPage = 1;
+  var like = 0;
+  var dislike = 0;
   Random random = Random();
 
   @override
@@ -28,138 +29,142 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
-      body: FutureBuilder<Character>(
-          future: futureCharacter,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              Character data = snapshot.data!;
-              return Slidable(
-                  startActionPane: ActionPane(
-                    motion: BehindMotion(),
-                    children: [
-                      SlidableAction(
-                        backgroundColor: Colors.red.shade700,
-                        onPressed: (context) => setState(() {
-                          futureCharacter =
-                              getCharacter(random.nextInt(825) + 1);
-                        }),
-                        foregroundColor: Colors.white,
-                        icon: Icons.thumb_down,
-                        label: 'Dislike',
-                      ),
-                    ],
-                  ),
-                  endActionPane: ActionPane(
-                    motion: BehindMotion(),
-                    children: [
-                      SlidableAction(
-                        backgroundColor: Colors.green.shade700,
-                        onPressed: (context) => setState(() {
-                          futureCharacter =
-                              getCharacter(random.nextInt(825) + 1);
-                        }),
-                        foregroundColor: Colors.white,
-                        icon: Icons.thumb_up,
-                        label: 'Like',
-                      ),
-                    ],
-                  ),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.45,
-                    child: Card(
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Image.network(data.image,
-                                width: MediaQuery.of(context).size.width,
-                                fit: BoxFit.cover),
-                          ),
-                          Padding(
-                              padding:
-                                  const EdgeInsetsDirectional.only(start: 16),
-                              child: Container(
-                                alignment: Alignment.centerLeft,
-                                child: Title(
-                                    color: Colors.white,
-                                    child: Text(
-                                      data.name,
-                                      textAlign: TextAlign.start,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 28),
-                                    )),
-                              )),
-                          Padding(
-                              padding:
-                                  const EdgeInsetsDirectional.only(start: 16),
-                              child: Container(
-                                alignment: Alignment.centerLeft,
-                                child: Title(
-                                    color: Colors.white,
-                                    child: Text(
-                                      data.species,
-                                      textAlign: TextAlign.start,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 20),
-                                    )),
-                              )),
-                          Divider(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                      padding: EdgeInsets.fromLTRB(8, 0, 0, 8),
-                                      child: Icon(Icons.thumb_up_outlined,
-                                          color: Colors.grey.shade400,size: 28)),
-                                  Padding(
-                                      padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
-                                      child: Text(
-                                        '0',
-                                        style: TextStyle(
-                                            color: Colors.grey.shade400,fontSize: 28),
-                                      )),
-                                ],
-                              ),
-                            ],
-                          ),
-                          /*ButtonBar(
-                            alignment: MainAxisAlignment.end,
-                            children: [
-                              FloatingActionButton.extended(
-                                label: Text("Dislike"),
-                                icon: const Icon(Icons.thumb_down),
-                                backgroundColor: Colors.red.shade700,
-                                onPressed: () {
-                                  // Perform some action
-                                },
-                              ),
-                              FloatingActionButton.extended(
-                                label: Text("Like"),
-                                icon: const Icon(Icons.thumb_up),
-                                backgroundColor: Colors.lightGreen.shade700,
-                                onPressed: () {
-                                  // Perform some action
-                                },
-                              )
-                            ],
-                          ),*/
-                        ],
-                      ),
+      body:
+          Column(children: [
+            FutureBuilder<Character>(
+                future: futureCharacter,
+                builder: (context, character) {
+                  if (character.hasData) {
+                    Character data = character.data!;
+                    return homeCardCharacter(data);
+                  } else if (character.hasError) {
+                    return Text('${character.error}');
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
+            //FutureBuilder<Location>(builder: builder)
+          ],)
+      );
+
+  Widget homeCardCharacter(Character data) {
+    return Slidable(
+        startActionPane: ActionPane(
+          motion: BehindMotion(),
+          children: [
+            SlidableAction(
+              backgroundColor: Colors.transparent,
+              onPressed: (context) => setState(() {
+                like = 0;
+                dislike = 0;
+                futureCharacter = getCharacter(random.nextInt(825) + 1);
+              }),
+              foregroundColor: Colors.white,
+              icon: Icons.refresh,
+              label: 'Refresh',
+            ),
+          ],
+        ),
+        endActionPane: ActionPane(
+          motion: BehindMotion(),
+          children: [
+            SlidableAction(
+              backgroundColor: Colors.green.shade700,
+              onPressed: (context) => setState(() {
+                like++;
+              }),
+              foregroundColor: Colors.white,
+              icon: Icons.thumb_up,
+              label: 'Like',
+            ),
+            SlidableAction(
+              backgroundColor: Colors.red.shade700,
+              onPressed: (context) => setState(() {
+                dislike++;
+              }),
+              foregroundColor: Colors.white,
+              icon: Icons.thumb_down,
+              label: 'Dislike',
+            ),
+          ],
+        ),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.45,
+          child: Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Image.network(data.image,
+                      width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.cover),
+                ),
+                Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 16),
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Title(
+                          color: Colors.white,
+                          child: Text(
+                            data.name,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 28),
+                          )),
+                    )),
+                Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 16),
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Title(
+                          color: Colors.white,
+                          child: Text(
+                            data.species,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.normal, fontSize: 20),
+                          )),
+                    )),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: Icon(Icons.thumb_up_outlined,
+                                color: Colors.green.shade700, size: 20)),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                            child: Text(
+                              '$like',
+                              style: TextStyle(
+                                  color: Colors.grey.shade400, fontSize: 20),
+                            )),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: Icon(Icons.thumb_down_outlined,
+                                color: Colors.red.shade700, size: 20)),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                            child: Text(
+                              '$dislike',
+                              style: TextStyle(
+                                  color: Colors.grey.shade400, fontSize: 20),
+                            )),
+                      ],
                     ),
-                  ));
-            } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }));
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ));
+  }
+
 }
 
 ListView _jobsListView(List<Character> data) {
